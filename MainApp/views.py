@@ -51,29 +51,7 @@ def chat_page(request):
     },
     tags=['API Information'],
 )
-@api_view(["GET"])
-def api_overview(request):
-    """
-    API Overview - Get information about available endpoints
-    """
-    return JsonResponse({
-        'message': 'Medical Message Classification API',
-        'version': 'v1.0.0',
-        'description': 'AI-powered medical message classification using DeepSeek-R1 model',
-        'endpoints': {
-            'submit_message': '/submit-message/ (POST)',
-            'swagger_ui': '/swagger/',
-            'redoc': '/redoc/',
-            'api_overview': '/api/',
-        },
-        'categories': ['emergency', 'routine', 'followup', 'other'],
-        'features': [
-            'AI-powered classification',
-            'Patient message history',
-            'Confidence scoring',
-            'Real-time processing'
-        ]
-    })
+
 
 @swagger_auto_schema(
     method='post',
@@ -119,7 +97,6 @@ def submit_message(request):
     - Raw AI response
     """
     try:
-        # Validate input using serializer
         if request.content_type == 'application/json':
             serializer = MessageInputSerializer(data=json.loads(request.body))
         else:
@@ -137,7 +114,6 @@ def submit_message(request):
         mobile = validated_data['mobile'] 
         message = validated_data['message']
 
-        # Generate AI response
         ai_response = generate_response(message)
         
         category = "other"
@@ -201,4 +177,3 @@ def submit_message(request):
             'success': False,
             'error': str(e)
         }, status=500)
-
