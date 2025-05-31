@@ -19,7 +19,7 @@ import re
 # Create your views here.
 def chat_page(request):
     """Render the chat page"""
-    return render(request, "chat.html")
+    return render(request, "form.html")
 
 @swagger_auto_schema(
     method='get',
