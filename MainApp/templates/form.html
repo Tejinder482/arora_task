@@ -213,13 +213,11 @@
             const successDiv = document.getElementById('successMessage');
             const responseArea = document.getElementById('responseArea');
             
-            // Hide previous messages
             errorDiv.style.display = 'none';
             successDiv.style.display = 'none';
             responseArea.style.display = 'none';
             loading.style.display = 'block';
             
-            // Create JSON data
             const data = {
                 name: formData.get('name'),
                 mobile: formData.get('mobile'),
@@ -242,11 +240,9 @@
                     successDiv.textContent = 'Message submitted successfully!';
                     successDiv.style.display = 'block';
                     
-                    // Show AI response
                     document.getElementById('responseText').textContent = data.ai_response;
                     responseArea.style.display = 'block';
                     
-                    // Reset form
                     document.getElementById('messageForm').reset();
                 } else {
                     errorDiv.textContent = 'Error: ' + (data.error || 'Something went wrong');
@@ -260,12 +256,10 @@
             });
         });
         
-        // Add real-time validation
         document.getElementById('mobile').addEventListener('input', function() {
             this.value = this.value.replace(/[^0-9+\-\s]/g, '');
         });
         
-        // Add character limit to message
         document.getElementById('message').addEventListener('input', function() {
             const maxLength = 500;
             if (this.value.length > maxLength) {

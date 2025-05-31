@@ -19,7 +19,7 @@ import re
 # Create your views here.
 def chat_page(request):
     """Render the chat page"""
-    return render(request, "form.html")
+    return render(request, "chat.html")
 
 @swagger_auto_schema(
     method='get',
@@ -51,7 +51,29 @@ def chat_page(request):
     },
     tags=['API Information'],
 )
-
+@api_view(["GET"])
+def api_overview(request):
+    """
+    API Overview - Get information about available endpoints
+    """
+    return JsonResponse({
+        'message': 'Medical Message Classification API',
+        'version': 'v1.0.0',
+        'description': 'AI-powered medical message classification using DeepSeek-R1 model',
+        'endpoints': {
+            'submit_message': '/submit-message/ (POST)',
+            'swagger_ui': '/swagger/',
+            'redoc': '/redoc/',
+            'api_overview': '/api/',
+        },
+        'categories': ['emergency', 'routine', 'followup', 'other'],
+        'features': [
+            'AI-powered classification',
+            'Patient message history',
+            'Confidence scoring',
+            'Real-time processing'
+        ]
+    })
 
 @swagger_auto_schema(
     method='post',
@@ -67,11 +89,57 @@ def chat_page(request):
     
     The API also returns the patient's message history based on mobile number.
     """,
-    request_body=MessageInputSerializer,
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        required=['name', 'mobile', 'message'],
+        properties={
+            'name': openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description="Patient's full name",
+                example="John Doe"
+            ),
+            'mobile': openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description="Patient's mobile number with country code",
+                example="+1234567890"
+            ),
+            'message': openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description="Medical message from the patient",
+                example="I have severe chest pain and difficulty breathing"
+            ),
+        }
+    ),
     responses={
         200: openapi.Response(
             description="Message successfully classified",
-            schema=MessageResponseSerializer
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'success': openapi.Schema(type=openapi.TYPE_BOOLEAN, example=True),
+                    'current_result': openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            'category': openapi.Schema(type=openapi.TYPE_STRING, example="emergency"),
+                            'confidence': openapi.Schema(type=openapi.TYPE_NUMBER, example=0.95)
+                        }
+                    ),
+                    'history': openapi.Schema(
+                        type=openapi.TYPE_ARRAY,
+                        items=openapi.Schema(
+                            type=openapi.TYPE_OBJECT,
+                            properties={
+                                'message': openapi.Schema(type=openapi.TYPE_STRING),
+                                'category': openapi.Schema(type=openapi.TYPE_STRING),
+                                'confidence': openapi.Schema(type=openapi.TYPE_NUMBER),
+                                'timestamp': openapi.Schema(type=openapi.TYPE_STRING)
+                            }
+                        )
+                    ),
+                    'ai_response': openapi.Schema(type=openapi.TYPE_STRING, example="emergency\n95%"),
+                    'timestamp': openapi.Schema(type=openapi.TYPE_STRING, example="14:25")
+                }
+            )
         ),
         400: openapi.Response(
             description="Invalid input data",
